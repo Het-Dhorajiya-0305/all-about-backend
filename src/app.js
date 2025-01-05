@@ -13,3 +13,7 @@ app.use(express.json({
     limit:"15kb"
 }))
 app.use(express.urlencoded())
+app.use(express.static("public"))
+app.use(express.cookieParser( ))
+
+export {app}
