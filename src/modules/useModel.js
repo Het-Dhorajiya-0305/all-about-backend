@@ -1,4 +1,4 @@
-import { faTerminal } from "@fortawesome/free-solid-svg-icons";
+
 import mongoose, { Schema } from "mongoose";
 import { jwt } from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -66,7 +66,7 @@ userSchema.methods.ispassWordCorrect=async function (password) {
 
 userSchema.methods.generateAccesstoken=function (){
         return jwt.sign(
-            {
+            { 
                 _id:this._id,
                 username:this.username,
                 fullname:this.fullname,
