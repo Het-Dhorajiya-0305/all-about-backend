@@ -1,5 +1,5 @@
 
-import { User } from '../models/useModel.js';
+import { User } from '../models/userModel.js';
 import { ApiError } from '../utils/Apierrors.js';
 import { aysnhandler } from '../utils/asynhandler.js'
 import { uploadCloudinary } from '../utils/cloudinary.js';
@@ -196,37 +196,33 @@ const refreshAccessToken = aysnhandler(async (req, res) => {
         throw new ApiError(401, "unauthorized token")
     }
     console.log("incomming token : ", incomingRefreshToken)
-    try {
-        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-        console.log()
-        const user = User.findById(decodedToken._id);
-        if (!user) {
-            throw new ApiError(404, "invald refresh token")
-        }
-
-        if (incomingRefreshToken !== user?.refreshToken) {
-            throw new ApiError(404, "incorrect refresh token")
-        }
-
-        const option = {
-            httpOnlt: true,
-            secure: ture
-        }
-            ;
-        const { accessToken, newRefreshtoken } = await generateAccessAndRefereshTokens(user_id);
-
-        return res
-            .status(200)
-            .cookie("accessToken", accessToken, option)
-            .cookie("refreshToken", newRefreshtoken, option)
-            .json(
-                new ApiResponse(200, { accessToken, refreshToken: newRefreshtoken }, "session is continue again")
-            )
-    } catch (error) {
-        throw new ApiError(404, error?.message || "invalid refresh token")
+    console.log("decoded token", decodedToken)
+    const user = User.findById(decodedToken?._id);
+    if (!user) {
+        throw new ApiError(404, "invald refresh token")
     }
 
+    console.log("user refreshTOken :",user.refreshToken)
+    if (incomingRefreshToken !== user?.refreshToken) {
+        throw new ApiError(404, "incorrect refresh token")
+    }
+
+    const option = {
+        httpOnlt: true,
+        secure: ture
+    }
+        ;
+    const { accessToken, newRefreshtoken } = await generateAccessAndRefereshTokens(user_id);
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, option)
+        .cookie("refreshToken", newRefreshtoken, option)
+        .json(
+            new ApiResponse(200, { accessToken, refreshToken: newRefreshtoken }, "session is continue again")
+        )
 
 })
 
